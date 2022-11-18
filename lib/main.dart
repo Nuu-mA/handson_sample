@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:template_flutter/pages/index.dart';
+import 'package:template_flutter/pages/issue_info.dart';
+import 'package:template_flutter/provider/app_provider.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initHiveForFlutter();
   runApp(const MyApp());
 }
 
@@ -9,59 +15,49 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'FlutterKaigi 2022',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return AppProvider(
+      child: MaterialApp(
+        title: 'FlutterKaigi 2022',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: const MyHomePage(appTitle: 'FlutterKaigi 2022 Demo Home Page'),
       ),
-      home: const MyHomePage(title: 'FlutterKaigi 2022 Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, this.title}) : super(key: key);
+class MyHomePage extends StatelessWidget {
+  const MyHomePage({
+    final Key? key,
+    required String appTitle,
+  })  : _appTitle = appTitle,
+        super(key: key);
 
-  final String? title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  final String _appTitle;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title!),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+        title: Text(_appTitle),
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) {
+                  return const IssueInputPage();
+                },
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            icon: const Icon(
+              Icons.add_circle_outline,
+              color: Colors.black,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      body: const IssueListPage(),
     );
   }
 }
